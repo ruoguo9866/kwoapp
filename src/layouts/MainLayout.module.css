@@ -1,0 +1,18 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-bottom: 0;
+}
+
+.content {
+  flex: 1;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabBar {
+  flex-shrink: 0;
+  border-top: 1px solid var(--adm-color-border, #eee);
+  background: var(--adm-color-background, #fff);
+}
