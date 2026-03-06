@@ -61,7 +61,9 @@ async function main() {
   }
 
   const argv = parseArgs()
-  const isInteractive = process.stdin.isTTY === true && process.stdout.isTTY === true
+  // 一些终端/执行器（例如 npm create / npx）下 stdout.isTTY 可能为 false
+  // 这里以 stdin 是否可交互作为主要判断，尽量让用户能选择模板
+  const isInteractive = process.stdin.isTTY === true
 
   let template = argv.template
   let projectName = argv.projectName
@@ -83,22 +85,32 @@ async function main() {
       title: `${t.title} - ${t.description}`,
       value: t.value,
     }))
-    const response = await prompts([
-      template == null
-        ? { type: 'select', name: 'template', message: '请选择模板', choices, initial: 0 }
-        : null,
-      projectName == null
-        ? {
+    try {
+      const response = await prompts([
+        template == null
+          ? { type: 'select', name: 'template', message: '请选择模板', choices, initial: 0 }
+          : null,
+        projectName == null
+          ? {
             type: 'text',
             name: 'projectName',
             message: '项目目录名',
             initial: 'kwoapp',
-            validate: (v) => (v && /^[\w-]+$/.test(v) ? true : '请输入合法目录名（字母、数字、横线、下划线）'),
+            validate: (v) =>
+              v && /^[A-Za-z0-9_-]+$/.test(v.trim())
+                ? true
+                : '请输入合法目录名（字母、数字、横线、下划线）',
           }
-        : null,
-    ].filter(Boolean))
-    if (response.template != null) template = response.template
-    if (response.projectName != null) projectName = response.projectName
+          : null,
+      ].filter(Boolean))
+      if (response.template != null) template = response.template
+      if (response.projectName != null) projectName = response.projectName
+    } catch (e) {
+      console.error('Error: interactive prompt failed. Please specify template explicitly.')
+      console.error(`Available templates: ${available.join(', ')}`)
+      console.error('Tip: npm create kwoapp my-app -- --template minimal')
+      process.exit(1)
+    }
   }
 
   if (template == null) template = available[0]
