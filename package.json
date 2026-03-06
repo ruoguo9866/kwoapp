@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ruoguo/k-date": "^1.0.0",
+    "@ruoguo/k-date": "^1.0.1",
     "@ruoguo/k-storage": "^1.0.0",
     "@ruoguo/k-uri": "^1.0.0",
     "@ruoguo/kres": "^1.0.0",

@@ -11,8 +11,12 @@ function UriDemo() {
   const [url, setUrl] = useState(window.location.href)
   const [paramKey, setParamKey] = useState('foo')
   const [paramValue, setParamValue] = useState('bar')
-  const [phone, setPhone] = useState('13800138000')
+  const [phone, setPhone] = useState('')
   const [address, setAddress] = useState('上海市人民广场')
+
+  /** 中国大陆 11 位手机号：1 开头，第二位 3-9 */
+  const isValidPhone = useMemo(() => /^1[3-9]\d{9}$/.test(phone.trim()), [phone])
+  const phoneError = phone.trim() && !isValidPhone ? '请输入正确的11位手机号' : ''
 
   const queryStr = useMemo(() => transFun(obj), [obj])
   const valueFromUrl = useMemo(() => uri.getValue(url, paramKey) ?? '', [url, paramKey])
@@ -33,24 +37,47 @@ function UriDemo() {
       <Card title="对象转查询串 transFun">
         <Space direction="vertical" block>
           <List>
-            <List.Item>
-              a：<Input
-                value={obj.a}
-                onChange={(v) => setObj((prev) => ({ ...prev, a: v }))}
-                placeholder="a"
-              />
+            <List.Item
+              style={{ alignItems: 'center' }}
+              extra={
+                <Input
+                  value={obj.a}
+                  onChange={(v) => setObj((prev) => ({ ...prev, a: v }))}
+                  placeholder="a"
+                  style={{ flex: 1, minWidth: 0 }}
+                />
+              }
+            >
+              a：
             </List.Item>
-            <List.Item>
-              b：<Input
-                value={obj.b}
-                onChange={(v) => setObj((prev) => ({ ...prev, b: v }))}
-                placeholder="b"
-              />
+            <List.Item
+              style={{ alignItems: 'center' }}
+              extra={
+                <Input
+                  value={obj.b}
+                  onChange={(v) => setObj((prev) => ({ ...prev, b: v }))}
+                  placeholder="b"
+                  style={{ flex: 1, minWidth: 0 }}
+                />
+              }
+            >
+              b：
             </List.Item>
           </List>
           <div style={{ fontSize: 13 }}>
-            <Tag color="primary">结果</Tag> <code>{queryStr}</code>
+            <Tag color="primary">结果</Tag> <code style={{ wordBreak: 'break-all' }}>{queryStr}</code>
           </div>
+          <Button
+            size="small"
+            onClick={() => {
+              navigator.clipboard.writeText(queryStr).then(
+                () => Toast.show({ content: '已复制查询串', icon: 'success' }),
+                () => Toast.show({ content: '复制失败', icon: 'fail' }),
+              )
+            }}
+          >
+            复制查询串
+          </Button>
         </Space>
       </Card>
 
@@ -79,8 +106,19 @@ function UriDemo() {
             <Tag color="primary">getValue</Tag> 当前值：<code>{valueFromUrl || '空'}</code>
           </div>
           <div style={{ fontSize: 13 }}>
-            <Tag color="success">setUrl</Tag> 新 URL：<code>{newUrl}</code>
+            <Tag color="success">setUrl</Tag> 新 URL：<code style={{ wordBreak: 'break-all' }}>{newUrl}</code>
           </div>
+          <Button
+            size="small"
+            onClick={() => {
+              navigator.clipboard.writeText(newUrl).then(
+                () => Toast.show({ content: '已复制到剪贴板', icon: 'success' }),
+                () => Toast.show({ content: '复制失败', icon: 'fail' }),
+              )
+            }}
+          >
+            复制新 URL
+          </Button>
         </Space>
       </Card>
 
@@ -107,9 +145,19 @@ function UriDemo() {
           >
             打开高德地图
           </Button>
-          <Input value={phone} onChange={setPhone} placeholder="电话" />
+          <Input
+            value={phone}
+            onChange={setPhone}
+            placeholder="请输入手机号"
+            type="tel"
+            maxLength={11}
+          />
+          {phoneError ? (
+            <div style={{ fontSize: 12, color: 'var(--adm-color-danger, #ff3141)' }}>{phoneError}</div>
+          ) : null}
           <Button
             size="small"
+            disabled={!phone.trim() || !isValidPhone}
             onClick={() => {
               Toast.show('将通过 uri.tel 唤起拨号')
               uri.tel(phone)

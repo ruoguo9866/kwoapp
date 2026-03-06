@@ -8,6 +8,8 @@ import User from '../pages/User'
 import Login from '../pages/Login'
 import DateDemo from '../pages/DateDemo'
 import UriDemo from '../pages/UriDemo'
+import UserSetting from '../pages/User/setting'
+import UserDetail from '../pages/User/detail'
 
 /**
  * 手动路由表：
@@ -28,6 +30,8 @@ function RouterConfig() {
         <Route index element={<Home />} />
         <Route path="list" element={<List />} />
         <Route path="user" element={<User />} />
+        <Route path="user/detail" element={<UserDetail />} />
+        <Route path="user/setting" element={<UserSetting />} />
         <Route path="date-demo" element={<DateDemo />} />
         <Route path="uri-demo" element={<UriDemo />} />
       </Route>

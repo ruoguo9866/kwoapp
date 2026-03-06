@@ -56,14 +56,11 @@ function User() {
   }
 
   return (
-    <div style={{ background: '#f5f5f5' }}>
+    <div>
       {/* 头部用户卡片 */}
       <div
         style={{
           padding: '24px 16px 16px',
-          background:
-            'linear-gradient(135deg, rgba(24,144,255,1) 0%, rgba(24,144,255,0.7) 50%, rgba(24,144,255,0.4) 100%)',
-          color: '#fff',
           display: 'flex',
           alignItems: 'center',
         }}
@@ -86,7 +83,7 @@ function User() {
                 {user?.name || '未登录用户'}
               </div>
               <div style={{ fontSize: 13, opacity: 0.8, marginTop: 4 }}>
-                {user?.id ? `ID：${user.id}` : '请先登录后查看详细信息'}
+               {user.phone}
               </div>
             </>
           )}
@@ -95,29 +92,25 @@ function User() {
 
       {/* 功能列表 */}
       <div style={{ padding: '12px 8px 80px' }}>
-        <List header="账号相关" style={{ borderRadius: 8, overflow: 'hidden' }}>
+        <List style={{ borderRadius: 8, overflow: 'hidden' }}>
           <List.Item
             prefix={<UserOutline />}
             extra={user?.name || '-'}
-            onClick={() => {
-              Toast.show({ content: '这里可以跳转到账号详情页（待实现）' })
-            }}
+            onClick={() => navigate('/user/detail')}
           >
             账号信息
           </List.Item>
           <List.Item
             prefix={<SetOutline />}
-            onClick={() => {
-              Toast.show({ content: '这里可以跳转到安全设置页（待实现）' })
-            }}
+            onClick={() => navigate('/user/setting')}
           >
-            安全设置
+            设置
           </List.Item>
         </List>
+        {/* 
+        <Divider /> */}
 
-        <Divider />
-
-        <Button
+        {/* <Button
           block
           color="danger"
           onClick={handleLogout}
@@ -125,7 +118,7 @@ function User() {
           style={{ marginTop: 12 }}
         >
           退出登录
-        </Button>
+        </Button> */}
       </div>
     </div>
   )
