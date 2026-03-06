@@ -1,6 +1,6 @@
 {
   "name": "create-kwoapp",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Scaffold for React + Vite mobile H5 app (antd-mobile, auth, mock, theme)",
   "type": "module",
   "bin": {

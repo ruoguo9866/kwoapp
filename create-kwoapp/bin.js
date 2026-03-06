@@ -10,16 +10,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const TEMPLATES_DIR = path.join(__dirname, 'templates')
 
 const TEMPLATES = [
-  {
-    value: 'default',
-    title: 'default',
-    description: '完整版：React + antd-mobile + 登录鉴权 + Mock + 主题',
-  },
-  {
-    value: 'minimal',
-    title: 'minimal',
-    description: '极简版：仅 Vite + React + 路由',
-  },
+  { value: 'default', title: 'default', description: '完整版：React + antd-mobile + 登录鉴权 + Mock + 主题' },
+  { value: 'minimal', title: 'minimal', description: '极简版：仅 Vite + React + 路由' },
 ]
 
 function getAvailableTemplates() {
@@ -28,6 +20,21 @@ function getAvailableTemplates() {
     .filter((e) => e.isDirectory())
     .map((d) => d.name)
     .filter((name) => TEMPLATES.some((t) => t.value === name))
+}
+
+function parseArgs() {
+  const args = process.argv.slice(2)
+  let template = null
+  let projectName = null
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--template' && args[i + 1]) {
+      template = args[i + 1]
+      i++
+    } else if (!args[i].startsWith('-') && projectName == null) {
+      projectName = args[i]
+    }
+  }
+  return { template, projectName }
 }
 
 function copyDirSync(src, dest, skip = () => false) {
@@ -53,50 +60,69 @@ async function main() {
     process.exit(1)
   }
 
-  const choices = TEMPLATES.filter((t) => available.includes(t.value)).map((t) => ({
-    title: `${t.title} - ${t.description}`,
-    value: t.value,
-  }))
+  const argv = parseArgs()
+  const isInteractive = process.stdin.isTTY === true && process.stdout.isTTY === true
 
-  const response = await prompts([
-    {
-      type: 'select',
-      name: 'template',
-      message: '请选择模板',
-      choices,
-      initial: 0,
-    },
-    {
-      type: 'text',
-      name: 'projectName',
-      message: '项目目录名',
-      initial: 'kwoapp',
-      validate: (v) => (v && /^[\w-]+$/.test(v) ? true : '请输入合法目录名（字母、数字、横线、下划线）'),
-    },
-  ])
+  let template = argv.template
+  let projectName = argv.projectName
 
-  if (response.template == null || response.projectName == null) {
-    process.exit(0)
+  // 非交互环境（无 TTY）无法让用户“选择模板”，此时要求显式传参，避免静默默认导致误用
+  if (!isInteractive) {
+    if (template == null) {
+      console.error('Error: non-interactive environment detected, please specify template explicitly.')
+      console.error(`Available templates: ${available.join(', ')}`)
+      console.error('Tip: npm create kwoapp my-app -- --template minimal')
+      console.error('Tip: npx create-kwoapp my-app --template minimal')
+      process.exit(1)
+    }
+    if (projectName == null || projectName === '') projectName = 'kwoapp'
   }
 
-  const projectName = response.projectName.trim() || 'kwoapp'
-  const targetDir = path.resolve(process.cwd(), projectName)
-  const templateDir = path.join(TEMPLATES_DIR, response.template)
+  if (isInteractive && (template == null || projectName == null)) {
+    const choices = TEMPLATES.filter((t) => available.includes(t.value)).map((t) => ({
+      title: `${t.title} - ${t.description}`,
+      value: t.value,
+    }))
+    const response = await prompts([
+      template == null
+        ? { type: 'select', name: 'template', message: '请选择模板', choices, initial: 0 }
+        : null,
+      projectName == null
+        ? {
+            type: 'text',
+            name: 'projectName',
+            message: '项目目录名',
+            initial: 'kwoapp',
+            validate: (v) => (v && /^[\w-]+$/.test(v) ? true : '请输入合法目录名（字母、数字、横线、下划线）'),
+          }
+        : null,
+    ].filter(Boolean))
+    if (response.template != null) template = response.template
+    if (response.projectName != null) projectName = response.projectName
+  }
 
-  if (!fs.existsSync(templateDir)) {
-    console.error(`Error: Template "${response.template}" not found.`)
+  if (template == null) template = available[0]
+  if (projectName == null || projectName === '') projectName = 'kwoapp'
+  projectName = projectName.trim()
+
+  if (!available.includes(template)) {
+    console.error(`Error: Template "${template}" not found. Available: ${available.join(', ')}`)
     process.exit(1)
   }
+
+  const targetDir = path.resolve(process.cwd(), projectName)
+  const templateDir = path.join(TEMPLATES_DIR, template)
 
   if (fs.existsSync(targetDir)) {
     const list = fs.readdirSync(targetDir)
     if (list.length > 0) {
       console.error(`Error: directory "${projectName}" already exists and is not empty.`)
+      console.error('Tip: Specify another name, e.g. npm create kwoapp my-app')
       process.exit(1)
     }
   }
 
-  console.log(`Creating project in ${targetDir} with template "${response.template}"...`)
+  console.log(`Creating project in ${targetDir} with template "${template}"...`)
   fs.mkdirSync(targetDir, { recursive: true })
   copyDirSync(templateDir, targetDir, (name) => name === 'node_modules' || name === '.git')
 

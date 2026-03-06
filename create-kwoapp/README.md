@@ -8,12 +8,15 @@
 npm create kwoapp
 ```
 
-按提示依次选择**模板**、输入**项目目录名**，会在当前目录创建项目并自动执行 `npm install`。
+在**支持交互的终端**中会依次提示选择**模板**、输入**项目目录名**，然后在当前目录创建项目并执行 `npm install`。
 
-等价写法：
+若无法交互（如部分环境或 CI），将**无法弹出模板选择**，此时需要显式指定 `--template`。
 
 ```bash
-npx create-kwoapp
+# 指定模板与目录名
+npm create kwoapp my-app -- --template minimal
+# 或
+npx create-kwoapp my-app --template minimal
 ```
 
 ## 模板说明
