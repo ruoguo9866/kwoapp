@@ -7,9 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "prepare:create-kwoapp": "node scripts/prepare-create-kwoapp.js",
-    "publish:create-kwoapp": "node scripts/prepare-create-kwoapp.js && cd create-kwoapp && npm publish"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@ruoguo/k-date": "^1.0.1",

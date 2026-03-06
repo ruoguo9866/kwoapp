@@ -59,42 +59,4 @@ VITE_API_BASE=/api
 
 ## 发布为 npm 脚手架
 
-本项目可发布为 `create-kwoapp`，供他人通过 `npm create kwoapp` 一键创建新项目。
-
-**完整步骤与常见问题见 [部署发布手册](docs/DEPLOY.md)。**
-
-### 发布前准备
-
-1. **更新模板快照**（将当前项目拷贝到 `create-kwoapp/template`）：
-
-   ```bash
-   node scripts/prepare-create-kwoapp.js
-   ```
-
-2. **进入脚手架包目录**：
-
-   ```bash
-   cd create-kwoapp
-   ```
-
-3. **登录 npm**（未登录时）：
-
-   ```bash
-   npm login
-   ```
-
-4. **发布**：
-
-   ```bash
-   npm publish
-   ```
-
-发布后，任何人可执行：
-
-```bash
-npm create kwoapp
-# 或
-npm create kwoapp my-app
-```
-
-会创建新目录并自动安装依赖。使用文档见 [create-kwoapp/README.md](create-kwoapp/README.md)。
+本项目可发布为 `create-kwoapp`。发布后用户执行 `npm create kwoapp`，按提示选择模板（default 完整版 / minimal 极简版）并输入项目名，会创建新目录并自动安装依赖。完整步骤见 [部署发布手册](docs/DEPLOY.md)，使用说明见 [create-kwoapp/README.md](create-kwoapp/README.md)。

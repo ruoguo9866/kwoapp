@@ -32,7 +32,7 @@
 
 ### 步骤 1：更新模板快照
 
-将当前项目（排除 node_modules、dist 等）复制到 `create-kwoapp/template`，保证发布出去的是最新代码。
+将当前项目（排除 node_modules、dist 等）复制到 `create-kwoapp/templates/default`，保证发布出去的完整版模板是最新代码。极简版 `templates/minimal` 为手写维护，无需脚本生成。
 
 ```bash
 npm run prepare:create-kwoapp
@@ -44,7 +44,7 @@ npm run prepare:create-kwoapp
 node scripts/prepare-create-kwoapp.js
 ```
 
-确认控制台输出：`Template prepared at create-kwoapp/template`。
+确认控制台输出：`Template prepared at create-kwoapp/templates/default`。
 
 ### 步骤 2：登录 npm（未登录时）
 
@@ -67,10 +67,16 @@ cd create-kwoapp
 npm publish
 ```
 
-若使用 scope 且首次发布：
+若账号开启了 **双重认证（2FA）**，需携带一次性验证码（来自 Authenticator 应用或短信）：
 
 ```bash
-npm publish --access public
+npm publish --otp=123456
+```
+
+将 `123456` 替换为当前 6 位验证码。若使用 scope 且首次发布：
+
+```bash
+npm publish --access public --otp=123456
 ```
 
 ### 步骤 4：确认发布结果
@@ -85,14 +91,10 @@ npm publish --access public
 用户无需克隆本仓库，只需执行：
 
 ```bash
-# 创建项目（会提示输入目录名，默认 kwoapp）
 npm create kwoapp
-
-# 或直接指定项目名
-npm create kwoapp my-app
 ```
 
-然后进入目录并启动：
+按提示**选择模板**（default 完整版 / minimal 极简版）、**输入项目目录名**，创建完成后进入目录并启动：
 
 ```bash
 cd my-app
@@ -128,7 +130,7 @@ npx create-kwoapp my-app
 |------|----------|
 | `npm publish` 报 403 / 未登录 | 在项目或任意目录执行 `npm login`，再执行 `npm publish` |
 | 包名已被占用 | 修改 `create-kwoapp/package.json` 的 `name`，或使用 scope |
-| 2FA 验证失败 | 在 npm 网站检查账号的 Two-Factor Authentication 设置，使用当前方式提供的验证码 |
+| 2FA 验证失败 / 提示需一次性密码 | 使用 `npm publish --otp=你的6位验证码`，验证码来自 Authenticator 或短信，需在有效期内输入 |
 | 发布后用户拉不到最新版 | 确认版本号已提升且已执行 `npm publish`；用户可先执行 `npm cache clean --force` 再重试 |
 | 想撤销刚发布的版本 | 72 小时内可 `npm unpublish create-kwoapp@版本号 --force`（慎用，可能影响依赖该版本的用户） |
 
@@ -153,3 +155,43 @@ npm run publish:create-kwoapp
 ```
 
 注意：版本号仍需在 `create-kwoapp/package.json` 中手动修改后再执行上述脚本。
+
+## 发布为 npm 脚手架
+
+本项目可发布为 `create-kwoapp`，供他人通过 `npm create kwoapp` 一键创建新项目。
+
+**完整步骤与常见问题见 [部署发布手册](docs/DEPLOY.md)。**
+
+### 发布前准备
+
+1. **更新模板快照**（将当前项目拷贝到 `create-kwoapp/template`）：
+
+   ```bash
+   node scripts/prepare-create-kwoapp.js
+   ```
+
+2. **进入脚手架包目录**：
+
+   ```bash
+   cd create-kwoapp
+   ```
+
+3. **登录 npm**（未登录时）：
+
+   ```bash
+   npm login
+   ```
+
+4. **发布**：
+
+   ```bash
+   npm publish
+   ```
+
+发布后，任何人可执行：
+
+```bash
+npm create kwoapp
+# 或
+npm create kwoapp my-app
+```

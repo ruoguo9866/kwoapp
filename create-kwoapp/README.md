@@ -1,49 +1,45 @@
 # create-kwoapp
 
-通过 npm 快速创建基于 **React + Vite** 的移动端 H5 项目模板（kwoapp 脚手架）。
+通过 npm 快速创建基于 **React + Vite** 的项目，支持多模板选择。
 
 ## 使用方式
-
-### 创建新项目（推荐）
 
 ```bash
 npm create kwoapp
 ```
 
-按提示输入项目目录名（直接回车则使用默认名 `kwoapp`），会在当前目录下创建子目录并自动执行 `npm install`。
+按提示依次选择**模板**、输入**项目目录名**，会在当前目录创建项目并自动执行 `npm install`。
 
-### 指定项目名
-
-```bash
-npm create kwoapp my-app
-```
-
-会在当前目录创建 `my-app` 文件夹并安装依赖。
-
-### 使用 npx
+等价写法：
 
 ```bash
 npx create-kwoapp
-npx create-kwoapp my-app
 ```
 
-## 创建完成后的步骤
+## 模板说明
+
+| 模板 | 说明 |
+|------|------|
+| **default** | 完整版：React + antd-mobile + 登录鉴权 + Mock + 主题、TabBar、账号/设置/详情页示例 |
+| **minimal** | 极简版：仅 Vite + React + react-router-dom，首页/关于两页 |
+
+创建完成后：
 
 ```bash
-cd my-app      # 进入项目目录
-npm run dev    # 启动开发服务（默认 http://localhost:8000，自动打开浏览器）
+cd <项目目录名>
+npm run dev
 ```
-
-## 模板包含内容
-
-- **技术栈**：React 18、Vite 7、antd-mobile 5、react-router-dom 7
-- **业务库**：@ruoguo/k-date、k-uri、k-storage、kres
-- **功能**：登录鉴权（AuthGuard）、Mock 接口、主题切换、TabBar 布局、账号/设置/详情页示例
-- **脚本**：`dev` / `build` / `preview` / `lint`
-
-详细说明见生成项目内的 `README.md`。
 
 ## 环境要求
 
 - Node.js >= 18.0.0
 
+## 发布（维护者）
+
+在仓库根目录：
+
+1. 更新 default 模板：`node scripts/prepare-create-kwoapp.js`
+2. 进入包目录：`cd create-kwoapp`
+3. 发布：`npm publish`（需先 `npm login`，2FA 时加 `--otp=验证码`）
+
+`templates/default` 由准备脚本从根项目生成，`templates/minimal` 为手写维护。

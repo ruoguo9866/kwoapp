@@ -1,24 +1,18 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Avatar, Button, Divider, List, Dialog, Toast, Skeleton } from 'antd-mobile'
+import { Avatar, List, Toast, Skeleton } from 'antd-mobile'
 import { UserOutline, SetOutline } from 'antd-mobile-icons'
 import { Storage } from '@ruoguo/k-storage'
 import { userApi } from '../../services/api'
-import { setToken } from '../../components/AuthGuard'
 
 function User() {
   const navigate = useNavigate()
-  // 首屏优先从本地缓存读取，避免页面空白闪烁
   const [loading, setLoading] = useState(false)
-  const [logoutLoading, setLogoutLoading] = useState(false)
   const [user, setUser] = useState(() => Storage.get('user-info') || null)
 
   useEffect(() => {
     const fetchUser = async () => {
-      // 如果本地没有缓存，再显示 loading；有缓存则后台静默刷新
-      if (!user) {
-        setLoading(true)
-      }
+      if (!user) setLoading(true)
       try {
         const res = await userApi.getUserInfo()
         if (res?.code === 0) {
@@ -34,26 +28,8 @@ function User() {
       }
     }
     fetchUser()
-    // 仅在首次挂载时执行
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  const handleLogout = async () => {
-    const result = await Dialog.confirm({
-      content: '确定要退出登录吗？',
-    })
-    if (!result) return
-
-    setLogoutLoading(true)
-    // 模拟一下退出请求的延迟
-    setTimeout(() => {
-      // 清除 token
-      setToken(null)
-      Toast.show({ content: '已退出登录', icon: 'success' })
-      navigate('/login', { replace: true })
-      setLogoutLoading(false)
-    }, 500)
-  }
 
   return (
     <div>
@@ -83,7 +59,7 @@ function User() {
                 {user?.name || '未登录用户'}
               </div>
               <div style={{ fontSize: 13, opacity: 0.8, marginTop: 4 }}>
-               {user.phone}
+                {user?.id ? (user.phone ? `手机：${user.phone}` : `ID：${user.id}`) : '请先登录后查看详细信息'}
               </div>
             </>
           )}
@@ -107,18 +83,6 @@ function User() {
             设置
           </List.Item>
         </List>
-        {/* 
-        <Divider /> */}
-
-        {/* <Button
-          block
-          color="danger"
-          onClick={handleLogout}
-          loading={logoutLoading}
-          style={{ marginTop: 12 }}
-        >
-          退出登录
-        </Button> */}
       </div>
     </div>
   )
