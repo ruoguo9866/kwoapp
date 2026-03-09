@@ -130,6 +130,12 @@ export default defineMock([
               image: '',
               url: '/uri-demo'
             },
+            {
+              id: 3,
+              name: 'kform-demo',
+              image: '',
+              url: '/form-demo'
+            },
           ]
         },
         msg: '获取列表成功'

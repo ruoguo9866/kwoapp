@@ -35,18 +35,6 @@ function Home() {
 
   // k-date 示例
   const formatted = kDate(now).format('YYYY-MM-DD HH:mm:ss')
-  const twoDaysAgo = kDate(now).subtract(2, 'day').fromNow()
-
-  // k-uri 示例
-  const queryStr = transFun({ from: 'home', ts: String(now.getTime()) })
-  // k-uri 的 setUrl 内部直接 new URL(url)，这里给它传绝对地址，避免 Invalid URL
-  const baseDemoUrl = `${window.location.origin}/demo?foo=bar`
-  const sampleUrl = uri.setUrl(baseDemoUrl, {
-    type: 'set',
-    params: 'extra',
-    value: '1',
-  })
-
   const handleOpenDemo = (url, name) => {
     // 内部路由跳转
     if (url?.startsWith('/')) {
@@ -70,34 +58,8 @@ function Home() {
         style={{ marginBottom: 12 }}
       >
         <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 4 }}>{formatted}</div>
-        <div style={{ fontSize: 13, color: '#999' }}>两天前：{twoDaysAgo}</div>
       </Card>
 
-      {/* k-uri 示例 */}
-      <Card
-        title={
-          <span>
-            <LinkOutline style={{ marginRight: 8 }} />
-            链接 & 参数工具（k-uri）
-          </span>
-        }
-        style={{ marginBottom: 12 }}
-      >
-        <div style={{ fontSize: 13, marginBottom: 4 }}>
-          <div>
-            <Tag color="primary" style={{ marginRight: 4 }}>
-              transFun
-            </Tag>
-            对象转查询串：<code>{queryStr}</code>
-          </div>
-          <div style={{ marginTop: 4 }}>
-            <Tag color="success" style={{ marginRight: 4 }}>
-              setUrl
-            </Tag>
-            修改 URL：<code>{sampleUrl}</code>
-          </div>
-        </div>
-      </Card>
 
       {/* 底部功能入口：来自 mock /api/home/info */}
       <Card title="功能示例" bodyStyle={{ padding: 0 }}>

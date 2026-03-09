@@ -10,7 +10,7 @@ import DateDemo from '../pages/DateDemo'
 import UriDemo from '../pages/UriDemo'
 import UserSetting from '../pages/User/setting'
 import UserDetail from '../pages/User/detail'
-
+import FormDemo from '../pages/FormDemo'  
 /**
  * 手动路由表：
  * - 使用 MainLayout 的为带底部 TabBar 的页面，需通过 AuthGuard 校验 token
@@ -34,6 +34,7 @@ function RouterConfig() {
         <Route path="user/setting" element={<UserSetting />} />
         <Route path="date-demo" element={<DateDemo />} />
         <Route path="uri-demo" element={<UriDemo />} />
+        <Route path="form-demo" element={<FormDemo />} />
       </Route>
       <Route path="/login" element={<BlankLayout />}>
         <Route index element={<Login />} />

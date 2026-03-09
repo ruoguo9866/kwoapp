@@ -26,15 +26,18 @@ function parseArgs() {
   const args = process.argv.slice(2)
   let template = null
   let projectName = null
+  let skipInstall = false
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--template' && args[i + 1]) {
       template = args[i + 1]
       i++
+    } else if (args[i] === '--no-install' || args[i] === '--skip-install') {
+      skipInstall = true
     } else if (!args[i].startsWith('-') && projectName == null) {
       projectName = args[i]
     }
   }
-  return { template, projectName }
+  return { template, projectName, skipInstall }
 }
 
 function copyDirSync(src, dest, skip = () => false) {
@@ -80,6 +83,7 @@ async function main() {
     if (projectName == null || projectName === '') projectName = 'kwoapp'
   }
 
+  let runInstall = !argv.skipInstall
   if (isInteractive && (template == null || projectName == null)) {
     const choices = TEMPLATES.filter((t) => available.includes(t.value)).map((t) => ({
       title: `${t.title} - ${t.description}`,
@@ -92,24 +96,35 @@ async function main() {
           : null,
         projectName == null
           ? {
-            type: 'text',
-            name: 'projectName',
-            message: '项目目录名',
-            initial: 'kwoapp',
-            validate: (v) =>
-              v && /^[A-Za-z0-9_-]+$/.test(v.trim())
-                ? true
-                : '请输入合法目录名（字母、数字、横线、下划线）',
-          }
+              type: 'text',
+              name: 'projectName',
+              message: '项目目录名',
+              initial: 'kwoapp',
+              validate: (v) =>
+                v && /^[A-Za-z0-9_-]+$/.test(v.trim())
+                  ? true
+                  : '请输入合法目录名（字母、数字、横线、下划线）',
+            }
           : null,
+        { type: 'confirm', name: 'runInstall', message: '是否需要执行 npm install？', initial: true },
       ].filter(Boolean))
       if (response.template != null) template = response.template
       if (response.projectName != null) projectName = response.projectName
+      if (response.runInstall === false) runInstall = false
     } catch (e) {
       console.error('Error: interactive prompt failed. Please specify template explicitly.')
       console.error(`Available templates: ${available.join(', ')}`)
       console.error('Tip: npm create kwoapp my-app -- --template minimal')
       process.exit(1)
+    }
+  } else if (isInteractive) {
+    try {
+      const res = await prompts([
+        { type: 'confirm', name: 'runInstall', message: '是否需要执行 npm install？', initial: true },
+      ])
+      if (res.runInstall === false) runInstall = false
+    } catch (e) {
+      runInstall = true
     }
   }
 
@@ -145,16 +160,19 @@ async function main() {
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
   }
 
-  console.log('Installing dependencies...')
-  const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm'
-  const result = spawnSync(npm, ['install'], {
-    cwd: targetDir,
-    stdio: 'inherit',
-    shell: true,
-  })
-  if (result.status !== 0) process.exit(result.status ?? 1)
-
-  console.log(`\nDone. Run:\n  cd ${projectName}\n  npm run dev\n`)
+  if (runInstall) {
+    console.log('Installing dependencies...')
+    const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm'
+    const result = spawnSync(npm, ['install'], {
+      cwd: targetDir,
+      stdio: 'inherit',
+      shell: true,
+    })
+    if (result.status !== 0) process.exit(result.status ?? 1)
+    console.log(`\nDone. Run:\n  cd ${projectName}\n  npm run dev\n`)
+  } else {
+    console.log(`\nDone (skipped npm install). Run:\n  cd ${projectName}\n  npm install\n  npm run dev\n`)
+  }
 }
 
 main()
